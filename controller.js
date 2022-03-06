@@ -3,16 +3,19 @@ const Urlmodel = require('./urlModel.js');
 
 exports.createShortUrl = async (req, res) => {
     try {
-        console.log(req.body);
         const url = req.body.url;
         const ID = await getRandomNumber();
         const shortUrl = idToShortUrl(ID);
 
-        const urlObj = await Urlmodel.create({
-            url,
-            shortUrl,
-            urlIdentifier: ID,
-        });
+        let urlObj = await Urlmodel.findOne({ url });
+
+        if (!urlObj) {
+            urlObj = await Urlmodel.create({
+                url,
+                shortUrl,
+                urlIdentifier: ID,
+            });
+        }
 
         res.status(201).json({
             status: 'success',
@@ -32,7 +35,7 @@ exports.getShortUrl = async (req, res) => {
         if (urlObj) {
             res.status(200).json({
                 status: 'success',
-                shortUrl: urlObj.shortUrl,
+                shortUrl: `${req.protocol}://${req.hostname}/${urlObj.shortUrl}`,
                 urlObj,
             });
         } else {
