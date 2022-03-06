@@ -6,10 +6,9 @@ exports.createShortUrl = async (req, res) => {
         const url = req.body.url;
         const ID = await getRandomNumber();
         const shortUrl = idToShortUrl(ID);
+        let urlObj = await Urlmodel.findOne({ url: req.body.url });
 
-        let urlObj = await Urlmodel.findOne({ url: url });
-
-        if (!urlObj) {
+        if (urlObj == null) {
             urlObj = await Urlmodel.create({
                 url,
                 shortUrl,
@@ -20,12 +19,12 @@ exports.createShortUrl = async (req, res) => {
         res.status(201).json({
             status: 'success',
             message: 'Scuccessfully shorted a Url!',
-            shortUrl: `${req.protocol}://${req.hostname}/${shortUrl}`,
+            shortUrl: `${req.protocol}://${req.hostname}/${urlObj.shortUrl}`,
         });
     } catch (err) {
         res.status(404).json({
             status: 'fail',
-            message: 'error',
+            message: err.message,
         });
     }
 };
