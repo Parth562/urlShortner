@@ -7,7 +7,7 @@ exports.createShortUrl = async (req, res) => {
         const ID = await getRandomNumber();
         const shortUrl = idToShortUrl(ID);
 
-        let urlObj = await Urlmodel.findOne({ url });
+        let urlObj = await Urlmodel.findOne({ url: url });
 
         if (!urlObj) {
             urlObj = await Urlmodel.create({
