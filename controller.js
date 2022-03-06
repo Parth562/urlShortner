@@ -17,7 +17,7 @@ exports.createShortUrl = async (req, res) => {
         res.status(201).json({
             status: 'success',
             message: 'Scuccessfully shorted a Url!',
-            shortUrl,
+            shortUrl: `${req.protocol}://${req.hostname}/${shortUrl}`,
         });
     } catch (err) {
         res.status(404).json({
