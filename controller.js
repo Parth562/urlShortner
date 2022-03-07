@@ -4,7 +4,7 @@ const Urlmodel = require('./urlModel.js');
 exports.createShortUrl = async (req, res) => {
     try {
         const url = req.body.url;
-        const ID = await getRandomNumber();
+        const ID = getRandomNumber(url);
         const shortUrl = idToShortUrl(ID);
         let urlObj = await Urlmodel.findOne({ url: req.body.url });
 
@@ -25,6 +25,7 @@ exports.createShortUrl = async (req, res) => {
         res.status(404).json({
             status: 'fail',
             message: err.message,
+            err,
         });
     }
 };
@@ -73,13 +74,22 @@ exports.reDirectToOriginal = async (request, response) => {
     }
 };
 
-const getRandomNumber = async () => {
-    let randomId = Math.floor(Math.random() * 100000);
-    let urlObj = await Urlmodel.findOne({ urlIdentifier: randomId });
-
-    if (urlObj) {
-        randomId = Math.floor(Math.random() * 100000);
+const getRandomNumber = (str) => {
+    let sum = 0;
+    const map =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    for (let i = 0; i < str.length; i++) {
+        if (str[i] >= 'a' && str[i] <= 'z') {
+            sum = sum + map.indexOf(str[i]) + 1;
+        } else if (str[i] >= 'A' && str[i] <= 'Z') {
+            sum = sum + map.indexOf(str[i]) + 27;
+        } else if (str[i] >= '0' && str[i] <= '9') {
+            sum = sum + map.indexOf(str[i]) + 53;
+        }
     }
+    const randomId =
+        Math.floor(Math.random() * 100000) +
+        Math.floor(Math.random() * 1000) * sum;
     return randomId;
 };
 
